@@ -4,4 +4,4 @@ project(PRJ)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(PRJ main.cpp
-        CS310_M1_Discussion.cpp)
+        Turman_CS310_M2_Discussion.cpp)
