@@ -64,7 +64,7 @@ string get_project_name()
     string project_name;
 
     cout << "Enter the name of your current project: ";
-    getline(cin, project_name);
+    get_line(cin, project_name);
 
     return projct_name;
 }
