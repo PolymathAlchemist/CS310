@@ -295,9 +295,12 @@ double calculate_average_daily_balance(
     int payment_days_before_cycle_end
 )
 {
-    return (net_balance * billing_cycle_days
+    double average_daily_balance =
+        (net_balance * billing_cycle_days
         - payment_amount * payment_days_before_cycle_end)
         / billing_cycle_days;
+
+    return average_daily_balance;
 }
 
 /**
@@ -320,5 +323,7 @@ double calculate_interest(
     double monthly_interest_rate
 )
 {
-    return average_daily_balance * monthly_interest_rate;
+    double interest_amount = average_daily_balance * monthly_interest_rate;
+
+    return interest_amount;
 }
