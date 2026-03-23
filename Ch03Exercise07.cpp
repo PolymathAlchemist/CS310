@@ -12,8 +12,8 @@
  * average daily balance method.
  *
  * Note:
- * This version includes modest input validation appropriate to the level
- * of the assignment without overengineering the solution.
+ * This version includes modest input validation as well as accommodating
+ * the fact that locale was not adding commas in as it should have.
  * ========================================================================
  */
 
