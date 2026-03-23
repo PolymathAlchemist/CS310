@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 4.1)
-project(PRJ)
+project(Ch03Exercise07)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(PRJ main.cpp
-        Turman_CS310_M2_Discussion.cpp)
+add_executable(Ch03Exercise07 Ch03Exercise07.cpp)
