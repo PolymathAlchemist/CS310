@@ -68,8 +68,8 @@ int main()
     // Output formatting configuration
     // --------------------------------------------------------------------
     cout << fixed << setprecision(2); // two decimal places
-    // --------------------------------------------------------------------
 
+    // --------------------------------------------------------------------
     net_balance = get_non_negative_double(
         "Enter the net balance shown on the bill: $"
     );

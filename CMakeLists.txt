@@ -4,3 +4,6 @@ project(Ch03Exercise07)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(Ch03Exercise07 Ch03Exercise07.cpp)
+
+# Ch03Exercise07 Ch03Exercise07.cpp
+# Ganthier_CS310-2.1 Ganthier_CS310-2.1.cpp
