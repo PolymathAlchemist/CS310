@@ -5,7 +5,6 @@
  * Assignment: M2 Assignment - Chapter 3, Programming Exercise 7
  * Author: Eric J. Turman
  * Date: 2026-03-23
- * Email: ejturman@my365.bellevue.edu
  *
  * Description:
  * Calculates the interest on a credit card's unpaid balance using the
@@ -18,16 +17,13 @@
  */
 
 // ========================================================================
-// Imports (Includes)
+// Imports (Includes) and Namespace
 // ========================================================================
 #include <iostream>
 #include <iomanip>
 #include <limits>
 #include <sstream>
 
-// ========================================================================
-// Namespace
-// ========================================================================
 using namespace std;
 
 // ========================================================================
@@ -36,6 +32,10 @@ using namespace std;
 double get_non_negative_double(const string& prompt_message);
 int get_positive_integer(const string& prompt_message);
 string format_with_commas(double numeric_value);
+int get_payment_days_before_cycle_end(
+    int billing_cycle_days,
+    const string& prompt_message
+);
 double calculate_average_daily_balance(
     double net_balance,
     double payment_amount,
@@ -53,6 +53,37 @@ double calculate_interest(
 int main()
 {
     // --------------------------------------------------------------------
+    // Constant declarations (prompts, messages)
+    // --------------------------------------------------------------------
+    const string INTRO_MESSAGE =
+        "You see before you John Cleese dressed in a black and red robe "
+        "wearing a skullcap with ram horns."
+        "\nAround his neck is a large bone necklace and  he holds a long "
+        "wooden staff."
+        "\nHe conjures fireballs and hurtles them at nearby hills. "
+        "\nYou call out to him, asking what and who he is. He turns to you "
+        "and says,"
+        "\n\"I am a financial enchanter capable of precisely "
+        "processing average daily balances and calculating interest.\n"
+        "Some call me... Tim.\"\n\n";
+
+    const string NET_BALANCE_PROMPT =
+        "Enter the net balance shown on the bill: $";
+
+    const string PAYMENT_PROMPT =
+        "Enter the payment made: $";
+
+    const string BILLING_DAYS_PROMPT =
+        "Enter the number of days in the billing cycle: ";
+
+    const string PAYMENT_DAYS_PROMPT =
+        "Enter the number of days the payment was made before the end "
+        "of the billing cycle: ";
+
+    const string INTEREST_RATE_PROMPT =
+        "Enter the monthly interest rate (example: 0.0152): ";
+
+    // --------------------------------------------------------------------
     // Variable declarations
     // --------------------------------------------------------------------
     double net_balance = 0.0;
@@ -65,43 +96,36 @@ int main()
     int payment_days_before_cycle_end = 0;
 
     // --------------------------------------------------------------------
-    // Output formatting configuration
+    // Output formatting
     // --------------------------------------------------------------------
-    cout << fixed << setprecision(2); // two decimal places
+    cout << fixed << setprecision(2);
 
     // --------------------------------------------------------------------
-    net_balance = get_non_negative_double(
-        "Enter the net balance shown on the bill: $"
+    // Introduction
+    // --------------------------------------------------------------------
+    cout << INTRO_MESSAGE;
+
+    // --------------------------------------------------------------------
+    // Input
+    // --------------------------------------------------------------------
+    net_balance = get_non_negative_double(NET_BALANCE_PROMPT);
+
+    payment_amount = get_non_negative_double(PAYMENT_PROMPT);
+
+    billing_cycle_days = get_positive_integer(BILLING_DAYS_PROMPT);
+
+    payment_days_before_cycle_end = get_payment_days_before_cycle_end(
+        billing_cycle_days,
+        PAYMENT_DAYS_PROMPT
     );
-
-    payment_amount = get_non_negative_double(
-        "Enter the payment made: $"
-    );
-
-    billing_cycle_days = get_positive_integer(
-        "Enter the number of days in the billing cycle: "
-    );
-
-    while (true)
-    {
-        payment_days_before_cycle_end = get_positive_integer(
-            "Enter the number of days the payment was made before the end "
-            "of the billing cycle: "
-        );
-
-        if (payment_days_before_cycle_end <= billing_cycle_days)
-        {
-            break;
-        }
-
-        cout << "Error: Payment days before cycle end cannot exceed the "
-             << "number of days in the billing cycle." << endl;
-    }
 
     monthly_interest_rate = get_non_negative_double(
-        "Enter the monthly interest rate (example: 0.0152): "
+        INTEREST_RATE_PROMPT
     );
 
+    // --------------------------------------------------------------------
+    // Processing
+    // --------------------------------------------------------------------
     average_daily_balance = calculate_average_daily_balance(
         net_balance,
         payment_amount,
@@ -114,10 +138,25 @@ int main()
         monthly_interest_rate
     );
 
-    cout << "\nAverage Daily Balance: $"
-         << format_with_commas(average_daily_balance) << endl;
-    cout << "Interest: $"
-         << format_with_commas(interest_amount) << endl;
+    // --------------------------------------------------------------------
+    // Output
+    // --------------------------------------------------------------------
+    cout << "\n------------------------------------------------------------\n";
+    cout << "Based on a net balance of $"
+         << format_with_commas(net_balance)
+         << " and a payment of $"
+         << format_with_commas(payment_amount)
+         << " made\n"
+         << payment_days_before_cycle_end
+         << " days before the end of a "
+         << billing_cycle_days
+         << "-day billing cycle, the average daily balance\nis $"
+         << format_with_commas(average_daily_balance);
+    cout << ".\n\nAt a monthly interest rate of "
+         << monthly_interest_rate * 100
+         << "%, the interest for this billing cycle is $"
+         << format_with_commas(interest_amount)
+         << ".\n";
 
     cout << "\nPress Enter to exit...";
     cin.get();
@@ -218,6 +257,7 @@ int get_positive_integer(const string& prompt_message)
             continue;
         }
 
+        // Early return with the value because a valid input was acquired.
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return numeric_value;
     }
@@ -238,8 +278,10 @@ int get_positive_integer(const string& prompt_message)
  *
  * Notes
  * -----
- * This helper is used because locale-based grouping did not behave
- * consistently in the local compiler environment.
+ * Locale-based grouping (e.g., locale("") with imbue) did not behave
+ * consistently in this development environment. Even explicitly specifying
+ * locale("en_US.UTF-8") did not produce the expected results, so a manual
+ * formatting approach was implemented.
  */
 string format_with_commas(double numeric_value)
 {
@@ -262,6 +304,51 @@ string format_with_commas(double numeric_value)
     }
 
     return numeric_text;
+}
+
+/**
+ * Prompt for the number of days a payment was made before the end of
+ * the billing cycle, ensuring it does not exceed the billing cycle length.
+ *
+ * Parameters
+ * ----------
+ * billing_cycle_days : int
+ *     The total number of days in the billing cycle.
+ * prompt_message : const string&
+ *     The prompt displayed to the user before input is read.
+ *
+ * Returns
+ * -------
+ * int
+ *     A validated number of days that is positive and less than or equal
+ *     to the billing cycle length.
+ *
+ * Notes
+ * -----
+ * This function encapsulates the constraint that payment timing cannot
+ * exceed the length of the billing cycle, keeping main() focused on
+ * high-level program flow.
+ */
+int get_payment_days_before_cycle_end(
+    int billing_cycle_days,
+    const string& prompt_message
+)
+{
+    int payment_days_before_cycle_end = 0;
+
+    while (true)
+    {
+        payment_days_before_cycle_end =
+            get_positive_integer(prompt_message);
+
+        if (payment_days_before_cycle_end <= billing_cycle_days)
+        {
+            return payment_days_before_cycle_end;
+        }
+
+        cout << "Error: Payment days before cycle end cannot exceed the "
+             << "number of days in the billing cycle." << endl;
+    }
 }
 
 /**
@@ -323,7 +410,8 @@ double calculate_interest(
     double monthly_interest_rate
 )
 {
-    double interest_amount = average_daily_balance * monthly_interest_rate;
+    double interest_amount =
+        average_daily_balance * monthly_interest_rate;
 
     return interest_amount;
 }
