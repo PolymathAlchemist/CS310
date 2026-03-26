@@ -3,7 +3,8 @@ project(Ch03Exercise07)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(Ch03Exercise07 Ch03Exercise07.cpp)
+#add_executable(Ch03Exercise07 Ch03Exercise07.cpp)
 
-# Ch03Exercise07 Ch03Exercise07.cpp
-# Ganthier_CS310-2.1 Ganthier_CS310-2.1.cpp
+# add_executable(Ch03Exercise07 Ch03Exercise07.cpp)
+# add_executable(M1_Discussion_Ganthier M1_Discussion_Ganthier.cpp)
+# add_executable(M1_Discussion_Preller M1_Discussion_Preller.cpp)
