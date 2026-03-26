@@ -23,3 +23,10 @@ int main() {
     cout << "\n\n  " << value1 << " times " << value2 << " equals " << value1 * value2 << endl;//Prints results
     getch();//Stops execution until user presses enter
 }
+
+/*
+ * DEBUGGING FIXES
+ * Line 14 : Added declaration of value1 by stating type int
+ * Line 18 : Changed \\ to // to make it comment
+ * Line 23 : Changed >> extraction operator to << insertion operator
+ */

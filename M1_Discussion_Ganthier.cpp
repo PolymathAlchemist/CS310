@@ -20,3 +20,11 @@ int main() {
     
     return 0;
 }
+
+/*
+ * DEBUGGING FIXES
+ * Line  8 : Added semicolon line terminator
+ * Line 11 : Changed << insertion operator to >> extraction operator
+ * Line 16 through
+ * Line 19 : Added a small code block to hold the CMD window open
+ */
