@@ -58,7 +58,7 @@ int main()
     const string INTRO_MESSAGE =
         "You see before you John Cleese dressed in a black and red robe "
         "wearing a skullcap with ram horns."
-        "\nAround his neck is a large bone necklace and  he holds a long "
+        "\nAround his neck is a large bone necklace and he holds a long "
         "wooden staff."
         "\nHe conjures fireballs and hurtles them at nearby hills. "
         "\nYou call out to him, asking what and who he is. He turns to you "
