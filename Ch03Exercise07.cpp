@@ -178,7 +178,7 @@ int main()
  *
  * Returns
  * -------
- * double
+ * numeric_value : double
  *     A validated non-negative decimal value.
  *
  * Notes
@@ -210,6 +210,7 @@ double get_non_negative_double(const string& prompt_message)
             continue;
         }
 
+        // Valid input acquired; return the value.
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return numeric_value;
     }
@@ -225,7 +226,7 @@ double get_non_negative_double(const string& prompt_message)
  *
  * Returns
  * -------
- * int
+ * numeric_value : int
  *     A validated integer greater than zero.
  *
  * Notes
@@ -257,7 +258,7 @@ int get_positive_integer(const string& prompt_message)
             continue;
         }
 
-        // Early return with the value because a valid input was acquired.
+        // Valid input acquired; return the value.
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return numeric_value;
     }
@@ -273,7 +274,7 @@ int get_positive_integer(const string& prompt_message)
  *
  * Returns
  * -------
- * string
+ * numeric_text : string
  *     A string formatted to two decimal places with comma separators.
  *
  * Notes
@@ -319,7 +320,7 @@ string format_with_commas(double numeric_value)
  *
  * Returns
  * -------
- * int
+ * payment_days_before_cycle_end : int
  *     A validated number of days that is positive and less than or equal
  *     to the billing cycle length.
  *
@@ -343,6 +344,7 @@ int get_payment_days_before_cycle_end(
 
         if (payment_days_before_cycle_end <= billing_cycle_days)
         {
+            // Valid input acquired; return the constrained value.
             return payment_days_before_cycle_end;
         }
 
@@ -368,7 +370,7 @@ int get_payment_days_before_cycle_end(
  *
  * Returns
  * -------
- * double
+ * average_daily_balance : double
  *     The calculated average daily balance.
  *
  * Notes
@@ -402,7 +404,7 @@ double calculate_average_daily_balance(
  *
  * Returns
  * -------
- * double
+ * interest_amount : double
  *     The interest charged on the unpaid balance.
  */
 double calculate_interest(
