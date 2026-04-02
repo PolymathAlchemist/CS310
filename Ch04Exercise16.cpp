@@ -30,6 +30,7 @@ using namespace std;
 // ========================================================================
 // Function Declarations
 // ========================================================================
+bool get_yes_or_enter(const string& prompt_message);
 double get_non_negative_double(const string& prompt_message);
 int get_non_negative_integer(const string& prompt_message);
 double calculate_option_one_royalty();
@@ -56,12 +57,19 @@ double determine_best_royalty(
 // ========================================================================
 // Main Execution
 // ========================================================================
-int main()
-{
+int main() {
     // --------------------------------------------------------------------
     // Constant declarations (fixed values, prompts, messages)
     // --------------------------------------------------------------------
     const string INTRO_MESSAGE =
+        "This program estimates an author's royalties under three contract "
+        "options \nand reports which option yields the highest royalty.\n";
+
+    const string INTRO_STORY_CHOICE_PROMPT =
+        "Would you like the accompanying story (Y) or press \"Enter\" "
+        "to continue to the inputs.";
+
+    const string INTRO_STORY_MESSAGE =
         "After saying goodbye to 'Tim the Financial Enchanter' you come "
         "across a curious clerk sitting at a desk in the middle of\n"
         "an open field. He looks up from his ledger and states, \"Well, "
@@ -84,6 +92,9 @@ int main()
     const string COPIES_SOLD_PROMPT =
         "What is estimated number of copies that will be sold: ";
 
+    const string REPEAT_PROMPT =
+    "Estimate another book? (Y) or press Enter to exit:";
+
     // --------------------------------------------------------------------
     // Variable declarations
     // --------------------------------------------------------------------
@@ -105,65 +116,74 @@ int main()
     // Introduction
     // --------------------------------------------------------------------
     cout << INTRO_MESSAGE << endl;
+    if (get_yes_or_enter(INTRO_STORY_CHOICE_PROMPT))
+    {
+        cout << "\n" << INTRO_STORY_MESSAGE << endl;
+    }
 
     // --------------------------------------------------------------------
-    // Input
+    // Main Loop
     // --------------------------------------------------------------------
-    net_price_per_copy = get_non_negative_double(NET_PRICE_PROMPT);
-    estimated_copies_sold = get_non_negative_integer(COPIES_SOLD_PROMPT);
+    do
+    {
 
-    // --------------------------------------------------------------------
-    // Processing
-    // --------------------------------------------------------------------
-    option_one_royalty = calculate_option_one_royalty();
+        // --------------------------------------------------------------------
+        // Input
+        // --------------------------------------------------------------------
+        net_price_per_copy = get_non_negative_double(NET_PRICE_PROMPT);
+        estimated_copies_sold = get_non_negative_integer(COPIES_SOLD_PROMPT);
 
-    option_two_royalty = calculate_option_two_royalty(
-        net_price_per_copy,
-        estimated_copies_sold
-    );
+        // --------------------------------------------------------------------
+        // Processing
+        // --------------------------------------------------------------------
+        option_one_royalty = calculate_option_one_royalty();
 
-    option_three_royalty = calculate_option_three_royalty(
-        net_price_per_copy,
-        estimated_copies_sold
-    );
+        option_two_royalty = calculate_option_two_royalty(
+            net_price_per_copy,
+            estimated_copies_sold
+        );
 
-    best_option = determine_best_option(
-        option_one_royalty,
-        option_two_royalty,
-        option_three_royalty
-    );
+        option_three_royalty = calculate_option_three_royalty(
+            net_price_per_copy,
+            estimated_copies_sold
+        );
 
-    best_royalty = determine_best_royalty(
-        option_one_royalty,
-        option_two_royalty,
-        option_three_royalty
-    );
+        best_option = determine_best_option(
+            option_one_royalty,
+            option_two_royalty,
+            option_three_royalty
+        );
 
-    // --------------------------------------------------------------------
-    // Output
-    // --------------------------------------------------------------------
-    cout << "\n------------------------------------------------------------\n";
-    cout << "Royalty estimates based on a net price of $"
-         << format_with_commas(net_price_per_copy, 2)
-         << " and estimated sales of "
-         << format_with_commas(estimated_copies_sold, 0)
-         << " copies:\n\n";
+        best_royalty = determine_best_royalty(
+            option_one_royalty,
+            option_two_royalty,
+            option_three_royalty
+        );
 
-    cout << "Option 1: $"
-         << format_with_commas(option_one_royalty, 2) << endl;
-    cout << "Option 2: $"
-         << format_with_commas(option_two_royalty, 2) << endl;
-    cout << "Option 3: $"
-         << format_with_commas(option_three_royalty, 2) << endl;
+        // --------------------------------------------------------------------
+        // Output
+        // --------------------------------------------------------------------
+        cout << "\n------------------------------------------------------------\n";
+        cout << "Royalty estimates based on a net price of $"
+             << format_with_commas(net_price_per_copy, 2)
+             << " and estimated sales of "
+             << format_with_commas(estimated_copies_sold, 0)
+             << " copies:\n\n";
 
-    cout << "\nBest option: Option "
-         << best_option
-         << " with estimated royalties of $"
-         << format_with_commas(best_royalty, 2)
-         << ".\n";
+        cout << "Option 1: $"
+             << format_with_commas(option_one_royalty, 2) << endl;
+        cout << "Option 2: $"
+             << format_with_commas(option_two_royalty, 2) << endl;
+        cout << "Option 3: $"
+             << format_with_commas(option_three_royalty, 2) << endl;
 
-    cout << "\nPress Enter to exit...";
-    cin.get();
+        cout << "\nBest option: Option "
+             << best_option
+             << " with estimated royalties of $"
+             << format_with_commas(best_royalty, 2)
+             << ".\n";
+
+    } while (get_yes_or_enter(REPEAT_PROMPT));
 
     return 0;
 }
@@ -171,6 +191,50 @@ int main()
 // ========================================================================
 // Function Definitions
 // ========================================================================
+
+/**
+ * Prompt the user for a simple yes/continue decision.
+ *
+ * Parameters
+ * ----------
+ * prompt_message : const string&
+ *     The message displayed to the user before input is read.
+ *
+ * Returns
+ * -------
+ * user_choice : bool
+ *     Returns true if the user enters 'Y' or 'y'.
+ *     Returns false if the user presses Enter with no input.
+ *
+ * Notes
+ * -----
+ * This function reads the entire line using getline so it can distinguish
+ * between a single-character response and empty input. Any input other than
+ * 'Y', 'y', or an empty line is rejected and the user is prompted again.
+ */
+bool get_yes_or_enter(const string& prompt_message)
+{
+    string user_input;
+
+    while (true)
+    {
+        cout << prompt_message << " ";
+        getline(cin, user_input);
+
+        if (user_input.empty())
+        {
+            return false;
+        }
+
+        if (user_input.length() == 1 &&
+            (user_input[0] == 'Y' || user_input[0] == 'y'))
+        {
+            return true;
+        }
+
+        cout << "Error: Enter 'Y' or press Enter to continue." << endl;
+    }
+}
 
 /**
  * Prompt for a non-negative decimal value.
@@ -187,41 +251,48 @@ int main()
  *
  * Notes
  * -----
- * This function clears the input stream when extraction fails so the
- * program can continue prompting cleanly after invalid input.
+ * This function reads the entire line first so it can distinguish between
+ * valid decimal input and input that contains extra characters.
  */
 double get_non_negative_double(const string& prompt_message)
 {
+    string user_input;
     double numeric_value = 0.0;
 
     while (true)
     {
         cout << prompt_message;
-        cin >> numeric_value;
+        getline(cin, user_input);
 
-        if (cin.fail())
+        if (user_input.empty())
         {
             cout << "Error: Please enter a valid numeric value." << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
-        if (cin.peek() != '\n')
+        stringstream input_stream(user_input);
+        input_stream >> numeric_value;
+
+        if (input_stream.fail())
+        {
+            cout << "Error: Please enter a valid numeric value." << endl;
+            continue;
+        }
+
+        input_stream >> ws;
+
+        if (!input_stream.eof())
         {
             cout << "Error: Invalid trailing characters detected." << endl;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
         if (numeric_value < 0.0)
         {
             cout << "Error: Value cannot be negative." << endl;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return numeric_value;
     }
 }
@@ -260,21 +331,27 @@ int get_non_negative_integer(const string& prompt_message)
             continue;
         }
 
-        if (user_input.find('.') != string::npos)
+        stringstream input_stream(user_input);
+        input_stream >> numeric_value;
+
+        if (input_stream.fail())
         {
-            cout << "Error: Decimal values are not allowed." << endl;
+            cout << "Error: Please enter a valid whole number." << endl;
             continue;
         }
 
-        // Use stringstream to detect and reject extra characters
-        // (e.g., "3.5" or "3abc") instead of partially accepting input
-        stringstream input_stream(user_input);
-        input_stream >> numeric_value;
         input_stream >> ws;
 
-        if (input_stream.fail() || !input_stream.eof())
+        if (!input_stream.eof())
         {
-            cout << "Error: Please enter a valid whole number." << endl;
+            if (user_input.find('.') != string::npos)
+            {
+                cout << "Error: Decimal values are not allowed." << endl;
+            }
+            else
+            {
+                cout << "Error: Please enter a valid whole number." << endl;
+            }
             continue;
         }
 
