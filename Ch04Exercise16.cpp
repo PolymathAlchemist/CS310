@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <limits>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -40,6 +41,7 @@ double calculate_option_three_royalty(
     double net_price_per_copy,
     int estimated_copies_sold
 );
+string format_with_commas(double numeric_value, int decimal_precision);
 int determine_best_option(
     double option_one_royalty,
     double option_two_royalty,
@@ -67,9 +69,14 @@ int main()
         "you are suddenly aware of holding. You hand it over, and after "
         "quickly flipping through the pages, he looks back up at\n"
         "you. \"I have a couple of questions for you, and I'll recommend the "
-        "best option for you that yields the highest return.\"\n";
-        "He hands you a paper decribing three optinos:\n\n"
-        ""
+        "best option for you that yields the highest return.\"\n"
+        "He hands you a paper describing three options:\n\n"
+        "  Option 1: $5,000 upon delivery + $20,000 upon publication (fixed).\n"
+        "  Option 2: 12.5% of net price per copy sold.\n"
+        "  Option 3: 10% of net price for the first 4,000 copies,\n"
+        "            then 14% for all additional copies.\n\n"
+        "\"Give me a few details,\" he says, \"and I'll recommend the best "
+        "option for you.\" \n";
 
     const string NET_PRICE_PROMPT =
         "What price will you sell each copy of the novel: $";
@@ -137,19 +144,22 @@ int main()
     // --------------------------------------------------------------------
     cout << "\n------------------------------------------------------------\n";
     cout << "Royalty estimates based on a net price of $"
-         << net_price_per_copy
+         << format_with_commas(net_price_per_copy, 2)
          << " and estimated sales of "
-         << estimated_copies_sold
+         << format_with_commas(estimated_copies_sold, 0)
          << " copies:\n\n";
 
-    cout << "Option 1: $" << option_one_royalty << endl;
-    cout << "Option 2: $" << option_two_royalty << endl;
-    cout << "Option 3: $" << option_three_royalty << endl;
+    cout << "Option 1: $"
+         << format_with_commas(option_one_royalty, 2) << endl;
+    cout << "Option 2: $"
+         << format_with_commas(option_two_royalty, 2) << endl;
+    cout << "Option 3: $"
+         << format_with_commas(option_three_royalty, 2) << endl;
 
     cout << "\nBest option: Option "
          << best_option
          << " with estimated royalties of $"
-         << best_royalty
+         << format_with_commas(best_royalty, 2)
          << ".\n";
 
     cout << "\nPress Enter to exit...";
@@ -197,6 +207,13 @@ double get_non_negative_double(const string& prompt_message)
             continue;
         }
 
+        if (cin.peek() != '\n')
+        {
+            cout << "Error: Invalid trailing characters detected." << endl;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+
         if (numeric_value < 0.0)
         {
             cout << "Error: Value cannot be negative." << endl;
@@ -221,39 +238,52 @@ double get_non_negative_double(const string& prompt_message)
  * -------
  * numeric_value : int
  *     A validated whole number that is zero or greater.
+ *
+ * Notes
+ * -----
+ * This function reads the entire line first so it can distinguish between
+ * valid integers and input that contains decimals or extra characters.
  */
 int get_non_negative_integer(const string& prompt_message)
 {
+    string user_input;
     int numeric_value = 0;
 
     while (true)
     {
         cout << prompt_message;
-        cin >> numeric_value;
+        getline(cin, user_input);
 
-        if (cin.fail())
+        if (user_input.empty())
         {
             cout << "Error: Please enter a valid whole number." << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+
+        if (user_input.find('.') != string::npos)
+        {
+            cout << "Error: Decimal values are not allowed." << endl;
+            continue;
+        }
+
+        // Use stringstream to detect and reject extra characters
+        // (e.g., "3.5" or "3abc") instead of partially accepting input
+        stringstream input_stream(user_input);
+        input_stream >> numeric_value;
+        input_stream >> ws;
+
+        if (input_stream.fail() || !input_stream.eof())
+        {
+            cout << "Error: Please enter a valid whole number." << endl;
             continue;
         }
 
         if (numeric_value < 0)
         {
             cout << "Error: Value cannot be negative." << endl;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
-        // Check for leftover input (like decimals)
-        if (cin.peek() != '\n')
-        {
-            cout << "Error: Decimal values are not allowed." << endl;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
-        }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return numeric_value;
     }
 }
@@ -367,6 +397,51 @@ double calculate_option_three_royalty(
 }
 
 /**
+ * Format a decimal value using commas as thousands separators.
+ *
+ * Parameters
+ * ----------
+ * numeric_value : double
+ *     The value to be converted into a formatted string.
+ * decimal_precision : int
+ *     Used to set the decimal precision.
+ *
+ * Returns
+ * -------
+ * numeric_text : string
+ *     A string formatted with comma separators and the requested precision.
+ *
+ * Notes
+ * -----
+ * Locale-based grouping (e.g., locale("") with imbue) did not behave
+ * consistently in this development environment. Even explicitly specifying
+ * locale("en_US.UTF-8") did not produce the expected results, so a manual
+ * formatting approach was implemented.
+ */
+string format_with_commas(double numeric_value, int decimal_precision)
+{
+    stringstream number_stream;
+    number_stream << fixed << setprecision(decimal_precision) << numeric_value;
+
+    string numeric_text = number_stream.str();
+    size_t decimal_position = numeric_text.find('.');
+
+    if (decimal_position == string::npos)
+    {
+        decimal_position = numeric_text.length();
+    }
+
+    for (int insert_position = static_cast<int>(decimal_position) - 3;
+         insert_position > 0;
+         insert_position -= 3)
+    {
+        numeric_text.insert(insert_position, ",");
+    }
+
+    return numeric_text;
+}
+
+/**
  * Determine which contract option produces the highest royalty.
  *
  * Parameters
@@ -431,17 +506,17 @@ double determine_best_royalty(
     double option_three_royalty
 )
 {
-    double best_royalty = option_one_royalty;
-
-    if (option_two_royalty > best_royalty)
+    if (option_one_royalty >= option_two_royalty
+        && option_one_royalty >= option_three_royalty)
     {
-        best_royalty = option_two_royalty;
+        return option_one_royalty;
     }
-
-    if (option_three_royalty > best_royalty)
+    else if (option_two_royalty >= option_three_royalty)
     {
-        best_royalty = option_three_royalty;
+        return option_two_royalty;
     }
-
-    return best_royalty;
+    else
+    {
+        return option_three_royalty;
+    }
 }
