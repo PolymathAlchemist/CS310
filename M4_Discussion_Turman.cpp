@@ -7,8 +7,16 @@
  * Date: 2026-04-05
  *
  * Description:
- * Prompts the user to enter numbers and calculates the sum.
+ * ------------
+ * Prompts the user to enter numbers and calculates the sum and the number
+ * of times that the user has entered a number.
  * The program repeats until the user presses Enter on a blank line.
+ * The program finishes by giving a total sum, total count of entries,
+ * and the average of all the entered numbers.
+ *
+ * Notes:
+ * ------
+ * This program includes two intentional errors.
  * ========================================================================
  */
 
