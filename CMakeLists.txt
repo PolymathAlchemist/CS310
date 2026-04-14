@@ -13,4 +13,6 @@ set(CMAKE_CXX_STANDARD 20)
 # add_executable(M3_Discussion_Planck M3_Discussion_Planck.cpp)
 # add_executable(M4_Discussion_Turman M4_Discussion_Turman.cpp)
 # add_executable(M4_Discussion_Preller M4_Discussion_Preller.cpp)
-add_executable(Ch05Exercise33 Ch05Exercise33.cpp)
+# add_executable(Ch05Exercise33 Ch05Exercise33.cpp)
+add_executable(M5_Discussion_Turman M5_Discussion_Turman.cpp)
+
