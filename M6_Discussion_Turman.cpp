@@ -19,7 +19,7 @@
  * dragon available for that scenario.
  *
  * Notes:
- * There are our bugs added three will cause bad behavior
+ * There are four intentional bugs added three will cause bad behavior
  * and one will fail at compile
  *
  * The code would be a lot cleaner and elegant with structs and classes
