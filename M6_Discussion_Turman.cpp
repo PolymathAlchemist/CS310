@@ -1349,34 +1349,35 @@ string get_dragon_description(DragonType dragon_type)
     switch (dragon_type)
     {
         case RED:
-            return "A domineering force that considers lesser hoards beneath its notice. "
+            return "A domineering force that considers lesser hoards beneath its notice.\n"
                    "When it moves, it expects the reward to justify its presence.";
         case BLUE:
-            return "Calculating and precise, it favors outcomes that are worth the effort. "
+            return "Calculating and precise, it favors outcomes that are worth the effort.\n"
                    "Rarely acts without weighing the long-term gain.";
         case GREEN:
-            return "Cunning and patient, with a preference for outcomes that offer more than "
-                   "they first appear to promise.";
+            return "Cunning and patient, with a preference for outcomes that offer\n"
+                   "more than they first appear to promise.";
         case BLACK:
-            return "Opportunistic and enduring, willing to tolerate a great deal if the outcome "
-                   "leans in its favor.";
+            return "Opportunistic and enduring, willing to tolerate a great deal\n"
+                   "if the outcome leans in its favor.";
         case WHITE:
-            return "Quick to act and quicker to abandon an uninteresting pursuit. "
+            return "Quick to act and quicker to abandon an uninteresting pursuit.\n"
                    "Instinct often outweighs deliberation.";
         case GOLD:
-            return "Ancient and deliberate, not easily swayed by mere wealth. "
+            return "Ancient and deliberate, not easily swayed by mere wealth.\n"
                    "Chooses its undertakings with great care.";
         case SILVER:
-            return "Swift and capable, with a balanced outlook on effort and reward. "
+            return "Swift and capable, with a balanced outlook on effort and reward.\n"
                    "Favors efficiency and clean outcomes.";
         case BRONZE:
-            return "Resolute and dependable, willing to commit when the endeavor appears worthwhile.";
+            return "Resolute and dependable, willing to commit when the endeavor\n"
+                   "appears worthwhile.";
         case COPPER:
-            return "Easily distracted and rarely committed to long, tedious endeavors. "
+            return "Easily distracted and rarely committed to long, tedious endeavors.\n"
                    "Prefers engagements that are as interesting as they are rewarding.";
         case BRASS:
-            return "Curious and talkative, but not particularly driven by labor-intensive pursuits. "
-                   "Favors lighter engagements.";
+            return "Curious and talkative, but not particularly driven by labor-intensive\n"
+                   "pursuits. Favors lighter engagements.";
         default:
             return "An unknown dragon, its tendencies unclear.";
     }
