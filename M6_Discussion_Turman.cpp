@@ -4,7 +4,7 @@
  * Instructor: Dr. Robert Flowers
  * Assignment: M6 Discussion
  * Author: Eric J. Turman
- * Date: 2026-04-21
+ * Date: 2026-04-20
  *
  * Description:
  * A dragon-broker simulation that presents a randomized treasure expedition
