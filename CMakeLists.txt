@@ -20,5 +20,6 @@ set(CMAKE_CXX_STANDARD 20)
 # add_executable(Ch06Exercise14_simulation CLEAN/Ch06Exercise14_simulation.cpp)
 # add_executable(M6_Discussion_Turman CLEAN/M6_Discussion_Turman.cpp)
 # add_executable(M6_Discussion_Turman_broken M6_Discussion_Turman.cpp)
-add_executable(M6_Discussion_Dorscher M6_Discussion_Dorscher.cpp)
+# add_executable(M6_Discussion_Dorscher M6_Discussion_Dorscher.cpp)
+add_executable(Ch07Exercise04 Ch07Exercise04.cpp)
 
