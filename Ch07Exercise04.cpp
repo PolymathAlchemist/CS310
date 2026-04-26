@@ -45,7 +45,7 @@ int main()
     const string INPUT_PROMPT = "Enter a string: ";
 
     const string AGAIN_PROMPT =
-        "Enter another string? (Y) or enter to Exit... ";
+        "Enter another string? [Y] or [Enter] to Exit... ";
 
     // --------------------------------------------------------------------
     // Variable declarations
@@ -95,8 +95,12 @@ int main()
  *
  * Notes
  * -----
- * The character is converted to lowercase before comparison so uppercase
- * and lowercase vowels are treated consistently.
+ * The character is converted to lowercase so uppercase and lowercase
+ * vowels are treated consistently.
+ *
+ * Uses VOWELS.find() and compares the result to string::npos to determine
+ * membership in the vowel set. This keeps the logic concise and avoids
+ * multiple explicit comparisons.
  */
 bool is_vowel(char character_to_check)
 {
@@ -163,6 +167,12 @@ string remove_vowels(const string& original_text)
  * user_choice : bool
  *     True when the user enters the true association and false when the
  *     user enters the false association.
+ *
+* Notes
+ * -----
+ * Refinement: Handles empty input (Enter) by displaying it as "[Enter]"
+ * so error messages remain clear. Uses ternary conditionals to keep this
+ * concise and consistent with other input options.
  */
 bool get_boolean_choice(
     const string& prompt_message,
@@ -213,10 +223,16 @@ bool get_boolean_choice(
             return false;
         }
 
+        string true_display =
+            true_association.empty() ? "[Enter]" : "[" + true_association + "]";
+
+        string false_display =
+            false_association.empty() ? "[Enter]" : "[" + false_association + "]";
+
         cout << "Error: Please enter "
-             << true_association
+             << true_display
              << " or "
-             << false_association
+             << false_display
              << "."
              << endl;
     }
