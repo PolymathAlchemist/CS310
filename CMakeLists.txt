@@ -25,5 +25,6 @@ set(CMAKE_CXX_STANDARD 20)
 # add_executable(M7_Discussion_Turman CLEAN/M7_Discussion_Turman.cpp)
 # add_executable(M7_Discussion_Turman M7_Discussion_Turman.cpp)
 # add_executable(M7_Discussion_Preller M7_Discussion_Preller.cpp)
-add_executable(Ch08Exercise07 Ch08Exercise07.cpp)
+# add_executable(Ch08Exercise07 Ch08Exercise07.cpp)
+add_executable(M7_Discussion_Dorscher M7_Discussion_Dorscher.cpp)
 
