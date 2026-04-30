@@ -47,7 +47,7 @@ using namespace std;
 // ========================================================================
 constexpr int CANDIDATE_COUNT = 5;
 constexpr int MINIMUM_VOTES = 0;
-constexpr int MAXIMUM_VOTES = 1000000000;
+constexpr int MAXIMUM_VOTES = 100000000;
 constexpr int PERCENTAGE_PRECISION = 2;
 constexpr int MINIMUM_CANDIDATE_NAME_WIDTH = 20;
 constexpr int MAXIMUM_CANDIDATE_NAME_WIDTH = 30;
