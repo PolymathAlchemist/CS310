@@ -1,5 +1,5 @@
 /**
- * ========================================================================
+* ========================================================================
  * Course: CS310-T301 Programming with C++
  * Instructor: Dr. Robert Flowers
  * Assignment: M7 Assignment
@@ -17,6 +17,16 @@
  * array-based data organization. Structs or classes would be a cleaner way
  * to group each candidate's name and vote count, but arrays match the
  * current assignment requirements and chapter focus.
+ *
+ * This version extends the textbook exercise with defensive input validation
+ * for candidate names and vote counts while preserving the original program
+ * requirements. It also uses dynamic table sizing so candidate names, vote
+ * totals, and percentages remain readable across a wider range of valid
+ * input.
+ *
+ * Very small non-zero percentages are displayed as "< 0.01%" rather than
+ * "0.00%" so the output does not imply a candidate received no measurable
+ * share of the vote.
  * ========================================================================
  */
 
@@ -39,11 +49,35 @@ constexpr int CANDIDATE_COUNT = 5;
 constexpr int MINIMUM_VOTES = 0;
 constexpr int MAXIMUM_VOTES = 1000000000;
 constexpr int PERCENTAGE_PRECISION = 2;
+constexpr int MINIMUM_CANDIDATE_NAME_WIDTH = 20;
+constexpr int MAXIMUM_CANDIDATE_NAME_WIDTH = 30;
+constexpr int VOTE_COUNT_WIDTH = 15;
+constexpr int PERCENTAGE_WIDTH = 10;
+const string ORDINAL_WORDS[CANDIDATE_COUNT] =
+{
+    "first",
+    "second",
+    "third",
+    "fourth",
+    "fifth"
+};
 
 // ========================================================================
 // Function (Prototype) Declarations
 // ========================================================================
 string format_with_commas(double numeric_value, int decimal_precision);
+
+string format_vote_percentage(int candidate_votes, int total_votes);
+
+int get_display_candidate_name_width(
+    const string candidate_names[],
+    int candidate_count
+);
+
+string format_candidate_name_for_table(
+    const string& candidate_name,
+    int display_width
+);
 
 string trim_text(const string& text_value);
 
@@ -106,8 +140,13 @@ int main()
     // Constant declarations
     // --------------------------------------------------------------------
     const string INTRODUCTION_MESSAGE =
-        "Local Election Results Calculator\n"
-        "---------------------------------";
+        "======================================================\n"
+        "          LOCAL ELECTION RESULTS CALCULATOR\n"
+        "======================================================\n"
+        "Enter Last names and vote counts and this program will\n"
+        "calculate each candidates percentage of votes and\n"
+        "provide the total number of votes received.\n"
+        "------------------------------------------------------\n";
 
     const string RUN_AGAIN_PROMPT =
         "\nRun another election? [Y] or press [Enter] to exit: ";
@@ -212,6 +251,140 @@ string format_with_commas(double numeric_value, int decimal_precision)
     }
 
     return numeric_text;
+}
+
+/**
+ * Format a candidate's vote share for table display.
+ *
+ * Parameters
+ * ----------
+ * candidate_votes : int
+ *     Number of votes received by one candidate.
+ *
+ * total_votes : int
+ *     Number of votes received by all candidates.
+ *
+ * Returns
+ * -------
+ * percentage_text : string
+ *     The candidate's vote share formatted for display.
+ *
+ * Notes
+ * -----
+ * Very small nonzero percentages should not appear as 0.00% because that
+ * hides the fact that the candidate did receive votes.
+ */
+string format_vote_percentage(int candidate_votes, int total_votes)
+{
+    if (candidate_votes == 0 || total_votes == 0)
+    {
+        return "0.00%";
+    }
+
+    const double vote_percentage = calculate_vote_percentage(
+        candidate_votes,
+        total_votes
+    );
+
+    if (vote_percentage > 0.0 && vote_percentage < 0.01)
+    {
+        return "<0.01%";
+    }
+
+    stringstream percentage_stream;
+    percentage_stream << fixed
+                      << setprecision(PERCENTAGE_PRECISION)
+                      << vote_percentage
+                      << "%";
+
+    return percentage_stream.str();
+}
+
+/**
+ * Determine the candidate-name column width from the report data.
+ *
+ * Parameters
+ * ----------
+ * candidate_names : const string[]
+ *     Array containing candidate last names.
+ *
+ * candidate_count : int
+ *     Number of candidate names stored in the array.
+ *
+ * Returns
+ * -------
+ * display_width : int
+ *     Candidate-name column width constrained to readable limits.
+ */
+int get_display_candidate_name_width(
+    const string candidate_names[],
+    int candidate_count
+)
+{
+    int longest_name_length = static_cast<int>(string("Candidate").length());
+
+    for (int index = 0; index < candidate_count; index++)
+    {
+        const int candidate_name_length = static_cast<int>(
+            candidate_names[index].length()
+        );
+
+        if (candidate_name_length > longest_name_length)
+        {
+            longest_name_length = candidate_name_length;
+        }
+    }
+
+    if (longest_name_length < MINIMUM_CANDIDATE_NAME_WIDTH)
+    {
+        return MINIMUM_CANDIDATE_NAME_WIDTH;
+    }
+
+    if (longest_name_length > MAXIMUM_CANDIDATE_NAME_WIDTH)
+    {
+        return MAXIMUM_CANDIDATE_NAME_WIDTH;
+    }
+
+    return longest_name_length;
+}
+
+/**
+ * Prepare a candidate name for the fixed-width results table.
+ *
+ * Parameters
+ * ----------
+ * candidate_name : const string&
+ *     The full candidate name stored for the report.
+ *
+ * display_width : int
+ *     Maximum width available in the table column.
+ *
+ * Returns
+ * -------
+ * table_name : string
+ *     Candidate name shortened only when needed to protect table layout.
+ *
+ * Notes
+ * -----
+ * Truncation is limited to the table so the full stored name remains
+ * available anywhere precision matters, such as winner reporting.
+ */
+string format_candidate_name_for_table(
+    const string& candidate_name,
+    int display_width
+)
+{
+    if (static_cast<int>(candidate_name.length()) <= display_width)
+    {
+        return candidate_name;
+    }
+
+    if (display_width <= 3)
+    {
+        return string(display_width, '.');
+    }
+
+    return candidate_name.substr(0, display_width - 3) + "...";
 }
 
 /**
@@ -584,7 +757,8 @@ void collect_election_data(
         while (true)
         {
             candidate_names[index] = get_candidate_last_name(
-                "Enter candidate " + to_string(index + 1) + " last name: "
+                "What is the " + ORDINAL_WORDS[index] +
+                " candidate's last name? "
             );
 
             bool duplicate_name_found = false;
@@ -614,7 +788,7 @@ void collect_election_data(
         }
 
         candidate_votes[index] = get_bounded_int(
-            "Enter votes received by " + candidate_names[index] + ": ",
+            "How many votes did " + candidate_names[index] + " receive? ",
             MINIMUM_VOTES,
             MAXIMUM_VOTES
         );
@@ -773,28 +947,39 @@ void display_election_results(
     int total_votes
 )
 {
+    const int candidate_name_width = get_display_candidate_name_width(
+        candidate_names,
+        candidate_count
+    );
+    const int table_width =
+        candidate_name_width +
+        VOTE_COUNT_WIDTH +
+        PERCENTAGE_WIDTH;
+
     cout << endl;
-    cout << fixed << setprecision(PERCENTAGE_PRECISION);
-    cout << left << setw(20) << "Candidate"
-         << right << setw(15) << "Votes"
-         << setw(18) << "Percent"
+    cout << left << setw(candidate_name_width) << "Candidate"
+         << right << setw(VOTE_COUNT_WIDTH) << "Votes"
+         << setw(PERCENTAGE_WIDTH) << "Percent"
          << endl;
-    cout << string(53, '-') << endl;
+    cout << string(table_width, '-') << endl;
 
     for (int index = 0; index < candidate_count; index++)
     {
-        cout << left << setw(20) << candidate_names[index]
-             << right << setw(15)
+        cout << left << setw(candidate_name_width)
+             << format_candidate_name_for_table(
+                 candidate_names[index],
+                 candidate_name_width
+             )
+             << right << setw(VOTE_COUNT_WIDTH)
              << format_with_commas(candidate_votes[index], 0)
-             << setw(17)
-             << calculate_vote_percentage(candidate_votes[index], total_votes)
-             << "%"
+             << setw(PERCENTAGE_WIDTH)
+             << format_vote_percentage(candidate_votes[index], total_votes)
              << endl;
     }
 
-    cout << string(53, '-') << endl;
-    cout << left << setw(20) << "Total"
-         << right << setw(15) << format_with_commas(total_votes, 0)
+    cout << string(table_width, '-') << endl;
+    cout << left << setw(candidate_name_width) << "Total"
+         << right << setw(VOTE_COUNT_WIDTH) << format_with_commas(total_votes, 0)
          << endl;
 }
 
