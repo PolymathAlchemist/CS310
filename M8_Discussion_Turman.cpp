@@ -79,6 +79,7 @@ constexpr double SNACK_COST = 50.0;
 constexpr double BROKER_COMMISSION_RATE = 0.10;
 constexpr int SECONDS_PER_TREASURE_UNIT = 1;
 constexpr double SECONDS_PER_HOUR = 3600.0;
+constexpr double GREED_INFLUENCE = 0.015;
 
 // ========================================================================
 // Helper Function Prototype Declarations
@@ -2020,7 +2021,8 @@ double calculate_perceived_value(
     double snack_cost
 )
 {
-    double greed_bonus = total_value * greed_modifier * 0.25;
+    const double greed_bonus =
+        total_value * greed_modifier * GREED_INFLUENCE;
     double time_penalty = travel_time_hours * time_sensitivity;
 
     return total_value + greed_bonus - time_penalty - snack_cost;
