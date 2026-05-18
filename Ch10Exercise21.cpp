@@ -77,6 +77,13 @@ constexpr int MENU_ADVANCE_ONE_MONTH = 4;
 constexpr int MENU_SIMULATE_MONTHS = 5;
 constexpr int MENU_EXIT = 6;
 
+enum numericInputType
+{
+    STANDARD_NUMBER_INPUT,
+    MONEY_INPUT,
+    APY_INPUT
+};
+
 // ========================================================================
 // Class Forward Declarations
 // ========================================================================
@@ -104,10 +111,12 @@ int get_bounded_integer_with_default(
     int default_value
 );
 
-double get_bounded_double(
+int get_bounded_integer_input(
     const string& prompt_message,
-    double minimum_value,
-    double maximum_value
+    int minimum_value,
+    int maximum_value,
+    bool default_is_allowed,
+    int default_value
 );
 
 string trim_text(const string& text_value);
@@ -122,6 +131,29 @@ bool parse_apy_input(
     const string& input_text,
     double& parsed_value,
     string& error_message
+);
+
+bool parse_standard_number_input(
+    const string& input_text,
+    double& parsed_value,
+    string& error_message
+);
+
+double get_bounded_numeric_input(
+    const string& prompt_message,
+    double minimum_value,
+    double maximum_value,
+    numericInputType input_type,
+    bool default_is_allowed,
+    double default_value
+);
+
+bool get_optional_bounded_numeric_input(
+    const string& prompt_message,
+    double minimum_value,
+    double maximum_value,
+    numericInputType input_type,
+    double& user_value
 );
 
 double get_bounded_money(
@@ -144,26 +176,11 @@ bool get_optional_bounded_money(
     double& user_value
 );
 
-double get_bounded_apy(
-    const string& prompt_message,
-    double minimum_value,
-    double maximum_value,
-    double default_value
-);
-
 double get_bounded_apy_with_default(
     const string& prompt_message,
     double minimum_value,
     double maximum_value,
     double default_value
-);
-
-bool get_optional_bounded_apy(
-    const string& prompt_message,
-    double minimum_value,
-    double maximum_value,
-    double default_value,
-    double& user_value
 );
 
 int get_menu_choice_with_enter_exit(
@@ -399,6 +416,10 @@ int main()
 
 // ========================================================================
 // Function Definitions
+//
+// Some functions are thin wrappers to keep the code easier to read, while
+// shared helper functions centralize input-loop, parsing, default, and
+// bounds logic.
 // ========================================================================
 
 /**
@@ -469,32 +490,13 @@ int get_bounded_integer(
     int maximum_value
 )
 {
-    int user_value = 0;
-
-    while (true)
-    {
-        cout << prompt_message;
-        cin >> user_value;
-
-        if (cin.fail())
-        {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Error: Please enter a whole number." << endl;
-            continue;
-        }
-
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        if (user_value < minimum_value || user_value > maximum_value)
-        {
-            cout << "Error: Please enter a value from "
-                << minimum_value << " to " << maximum_value << "." << endl;
-            continue;
-        }
-
-        return user_value;
-    }
+    return get_bounded_integer_input(
+        prompt_message,
+        minimum_value,
+        maximum_value,
+        false,
+        0
+    );
 }
 
 /**
@@ -526,6 +528,48 @@ int get_bounded_integer_with_default(
     int default_value
 )
 {
+    return get_bounded_integer_input(
+        prompt_message,
+        minimum_value,
+        maximum_value,
+        true,
+        default_value
+    );
+}
+
+/**
+ * Prompt for a bounded integer value.
+ *
+ * Parameters
+ * ----------
+ * prompt_message : const string&
+ *     The message displayed before reading input.
+ *
+ * minimum_value : int
+ *     The smallest accepted value.
+ *
+ * maximum_value : int
+ *     The largest accepted value.
+ *
+ * default_is_allowed : bool
+ *     Whether pressing Enter should use a default value.
+ *
+ * default_value : int
+ *     The value used when defaults are enabled and the user presses Enter.
+ *
+ * Returns
+ * -------
+ * user_value : int
+ *     A validated integer in the requested range.
+ */
+int get_bounded_integer_input(
+    const string& prompt_message,
+    int minimum_value,
+    int maximum_value,
+    bool default_is_allowed,
+    int default_value
+)
+{
     string input_text;
     int user_value = default_value;
 
@@ -536,7 +580,13 @@ int get_bounded_integer_with_default(
 
         if (trim_text(input_text).empty())
         {
-            return default_value;
+            if (default_is_allowed)
+            {
+                return default_value;
+            }
+
+            cout << "Error: Please enter a whole number." << endl;
+            continue;
         }
 
         stringstream input_stream(input_text);
@@ -552,60 +602,6 @@ int get_bounded_integer_with_default(
         {
             cout << "Error: Please enter a value from "
                 << minimum_value << " to " << maximum_value << "." << endl;
-            continue;
-        }
-
-        return user_value;
-    }
-}
-
-/**
- * Prompt for a decimal value within an allowed range.
- *
- * Parameters
- * ----------
- * prompt_message : const string&
- *     The message displayed before reading input.
- *
- * minimum_value : double
- *     The smallest accepted value.
- *
- * maximum_value : double
- *     The largest accepted value.
- *
- * Returns
- * -------
- * user_value : double
- *     A validated decimal value in the requested range.
- */
-double get_bounded_double(
-    const string& prompt_message,
-    double minimum_value,
-    double maximum_value
-)
-{
-    double user_value = 0.0;
-
-    while (true)
-    {
-        cout << prompt_message;
-        cin >> user_value;
-
-        if (cin.fail())
-        {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Error: Please enter a numeric value." << endl;
-            continue;
-        }
-
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        if (user_value < minimum_value || user_value > maximum_value)
-        {
-            cout << "Error: Please enter a value from "
-                << format_with_commas(minimum_value, 2) << " to "
-                << format_with_commas(maximum_value, 2) << "." << endl;
             continue;
         }
 
@@ -799,6 +795,286 @@ bool parse_apy_input(
 }
 
 /**
+ * Parse standard numeric input.
+ *
+ * Parameters
+ * ----------
+ * input_text : const string&
+ *     The user's raw numeric input.
+ *
+ * parsed_value : double&
+ *     The parsed value when input is valid.
+ *
+ * error_message : string&
+ *     A helpful message when input cannot be parsed.
+ *
+ * Returns
+ * -------
+ * input_was_parsed : bool
+ *     True when the input can be converted to a numeric value.
+ */
+bool parse_standard_number_input(
+    const string& input_text,
+    double& parsed_value,
+    string& error_message
+)
+{
+    const string working_text = trim_text(input_text);
+
+    if (working_text.empty())
+    {
+        error_message = "Error: Please enter a numeric value.";
+        return false;
+    }
+
+    try
+    {
+        size_t parsed_character_count = 0;
+        parsed_value = stod(working_text, &parsed_character_count);
+
+        if (parsed_character_count != working_text.length())
+        {
+            error_message = "Error: Please enter only a numeric value.";
+            return false;
+        }
+    }
+    catch (...)
+    {
+        error_message = "Error: Please enter a valid numeric value.";
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Prompt for a bounded numeric value.
+ *
+ * Parameters
+ * ----------
+ * prompt_message : const string&
+ *     The message displayed before reading input.
+ *
+ * minimum_value : double
+ *     The smallest accepted value.
+ *
+ * maximum_value : double
+ *     The largest accepted value.
+ *
+ * input_type : numericInputType
+ *     The parser mode used to interpret the input text.
+ *
+ * default_is_allowed : bool
+ *     Whether pressing Enter should use a default value.
+ *
+ * default_value : double
+ *     The value used when defaults are enabled and the user presses Enter.
+ *
+ * Returns
+ * -------
+ * user_value : double
+ *     A validated numeric value.
+ */
+double get_bounded_numeric_input(
+    const string& prompt_message,
+    double minimum_value,
+    double maximum_value,
+    numericInputType input_type,
+    bool default_is_allowed,
+    double default_value
+)
+{
+    string input_text;
+    string error_message;
+    double user_value = default_value;
+
+    while (true)
+    {
+        cout << prompt_message;
+        getline(cin, input_text);
+
+        if (trim_text(input_text).empty())
+        {
+            if (default_is_allowed)
+            {
+                return default_value;
+            }
+
+            cout << "Error: Please enter a value." << endl;
+            continue;
+        }
+
+        bool input_was_parsed = false;
+
+        if (input_type == MONEY_INPUT)
+        {
+            input_was_parsed = parse_money_input(
+                input_text,
+                user_value,
+                error_message
+            );
+        }
+        else if (input_type == APY_INPUT)
+        {
+            input_was_parsed = parse_apy_input(
+                input_text,
+                user_value,
+                error_message
+            );
+        }
+        else
+        {
+            input_was_parsed = parse_standard_number_input(
+                input_text,
+                user_value,
+                error_message
+            );
+        }
+
+        if (!input_was_parsed)
+        {
+            cout << error_message << endl;
+            continue;
+        }
+
+        if (user_value < minimum_value || user_value > maximum_value)
+        {
+            if (input_type == MONEY_INPUT)
+            {
+                cout << "Error: Please enter a value from $"
+                    << format_with_commas(minimum_value, 2) << " to $"
+                    << format_with_commas(maximum_value, 2) << "." << endl;
+            }
+            else if (input_type == APY_INPUT)
+            {
+                cout << "Error: Please enter an APY from "
+                    << fixed << setprecision(2) << minimum_value * 100.0
+                    << "% to " << maximum_value * 100.0 << "%." << endl;
+            }
+            else
+            {
+                cout << "Error: Please enter a value from "
+                    << format_with_commas(minimum_value, 2) << " to "
+                    << format_with_commas(maximum_value, 2) << "." << endl;
+            }
+
+            continue;
+        }
+
+        return user_value;
+    }
+}
+
+/**
+ * Prompt for an optional bounded numeric value.
+ *
+ * Parameters
+ * ----------
+ * prompt_message : const string&
+ *     The message displayed before reading input.
+ *
+ * minimum_value : double
+ *     The smallest accepted value.
+ *
+ * maximum_value : double
+ *     The largest accepted value.
+ *
+ * input_type : numericInputType
+ *     The parser mode used to interpret the input text.
+ *
+ * user_value : double&
+ *     The parsed and bounded numeric value.
+ *
+ * Returns
+ * -------
+ * value_was_entered : bool
+ *     True when the user enters a valid value, false when the user presses
+ *     Enter.
+ */
+bool get_optional_bounded_numeric_input(
+    const string& prompt_message,
+    double minimum_value,
+    double maximum_value,
+    numericInputType input_type,
+    double& user_value
+)
+{
+    string input_text;
+    string error_message;
+
+    while (true)
+    {
+        cout << prompt_message;
+        getline(cin, input_text);
+
+        if (trim_text(input_text).empty())
+        {
+            user_value = 0.0;
+            return false;
+        }
+
+        bool input_was_parsed = false;
+
+        if (input_type == MONEY_INPUT)
+        {
+            input_was_parsed = parse_money_input(
+                input_text,
+                user_value,
+                error_message
+            );
+        }
+        else if (input_type == APY_INPUT)
+        {
+            input_was_parsed = parse_apy_input(
+                input_text,
+                user_value,
+                error_message
+            );
+        }
+        else
+        {
+            input_was_parsed = parse_standard_number_input(
+                input_text,
+                user_value,
+                error_message
+            );
+        }
+
+        if (!input_was_parsed)
+        {
+            cout << error_message << endl;
+            continue;
+        }
+
+        if (user_value < minimum_value || user_value > maximum_value)
+        {
+            if (input_type == MONEY_INPUT)
+            {
+                cout << "Error: Please enter a value from $"
+                    << format_with_commas(minimum_value, 2) << " to $"
+                    << format_with_commas(maximum_value, 2) << "." << endl;
+            }
+            else if (input_type == APY_INPUT)
+            {
+                cout << "Error: Please enter an APY from "
+                    << fixed << setprecision(2) << minimum_value * 100.0
+                    << "% to " << maximum_value * 100.0 << "%." << endl;
+            }
+            else
+            {
+                cout << "Error: Please enter a value from "
+                    << format_with_commas(minimum_value, 2) << " to "
+                    << format_with_commas(maximum_value, 2) << "." << endl;
+            }
+
+            continue;
+        }
+
+        return true;
+    }
+}
+
+/**
  * Prompt for a bounded money amount.
  *
  * Parameters
@@ -823,31 +1099,14 @@ double get_bounded_money(
     double maximum_value
 )
 {
-    string input_text;
-    double user_value = 0.0;
-    string error_message;
-
-    while (true)
-    {
-        cout << prompt_message;
-        getline(cin, input_text);
-
-        if (!parse_money_input(input_text, user_value, error_message))
-        {
-            cout << error_message << endl;
-            continue;
-        }
-
-        if (user_value < minimum_value || user_value > maximum_value)
-        {
-            cout << "Error: Please enter a value from $"
-                << format_with_commas(minimum_value, 2) << " to $"
-                << format_with_commas(maximum_value, 2) << "." << endl;
-            continue;
-        }
-
-        return user_value;
-    }
+    return get_bounded_numeric_input(
+        prompt_message,
+        minimum_value,
+        maximum_value,
+        MONEY_INPUT,
+        false,
+        0.0
+    );
 }
 
 /**
@@ -879,19 +1138,14 @@ double get_bounded_money_with_default(
     double default_value
 )
 {
-    double user_value = default_value;
-
-    if (get_optional_bounded_money(
+    return get_bounded_numeric_input(
         prompt_message,
         minimum_value,
         maximum_value,
-        user_value
-    ))
-    {
-        return user_value;
-    }
-
-    return default_value;
+        MONEY_INPUT,
+        true,
+        default_value
+    );
 }
 
 /**
@@ -923,77 +1177,13 @@ bool get_optional_bounded_money(
     double& user_value
 )
 {
-    string input_text;
-    string error_message;
-
-    while (true)
-    {
-        cout << prompt_message;
-        getline(cin, input_text);
-
-        if (trim_text(input_text).empty())
-        {
-            user_value = 0.0;
-            return false;
-        }
-
-        if (!parse_money_input(input_text, user_value, error_message))
-        {
-            cout << error_message << endl;
-            continue;
-        }
-
-        if (user_value < minimum_value || user_value > maximum_value)
-        {
-            cout << "Error: Please enter a value from $"
-                << format_with_commas(minimum_value, 2) << " to $"
-                << format_with_commas(maximum_value, 2) << "." << endl;
-            continue;
-        }
-
-        return true;
-    }
-}
-
-/**
- * Prompt for a bounded APY value with an optional default.
- *
- * Parameters
- * ----------
- * prompt_message : const string&
- *     The message displayed before reading input.
- *
- * minimum_value : double
- *     The smallest accepted decimal APY.
- *
- * maximum_value : double
- *     The largest accepted decimal APY.
- *
- * default_value : double
- *     The decimal APY used when the user presses Enter.
- *
- * Returns
- * -------
- * user_value : double
- *     A validated APY as a decimal rate.
- */
-double get_bounded_apy(
-    const string& prompt_message,
-    double minimum_value,
-    double maximum_value,
-    double default_value
-)
-{
-    double user_value = default_value;
-    get_optional_bounded_apy(
+    return get_optional_bounded_numeric_input(
         prompt_message,
         minimum_value,
         maximum_value,
-        default_value,
+        MONEY_INPUT,
         user_value
     );
-
-    return user_value;
 }
 
 /**
@@ -1025,77 +1215,14 @@ double get_bounded_apy_with_default(
     double default_value
 )
 {
-    return get_bounded_apy(
+    return get_bounded_numeric_input(
         prompt_message,
         minimum_value,
         maximum_value,
+        APY_INPUT,
+        true,
         default_value
     );
-}
-
-/**
- * Prompt for an optional bounded APY value.
- *
- * Parameters
- * ----------
- * prompt_message : const string&
- *     The message displayed before reading input.
- *
- * minimum_value : double
- *     The smallest accepted decimal APY.
- *
- * maximum_value : double
- *     The largest accepted decimal APY.
- *
- * default_value : double
- *     The decimal APY used when the user presses Enter.
- *
- * user_value : double&
- *     The parsed APY as a decimal rate.
- *
- * Returns
- * -------
- * value_was_entered : bool
- *     True when the user enters an APY, false when the default is used.
- */
-bool get_optional_bounded_apy(
-    const string& prompt_message,
-    double minimum_value,
-    double maximum_value,
-    double default_value,
-    double& user_value
-)
-{
-    string input_text;
-    string error_message;
-
-    while (true)
-    {
-        cout << prompt_message;
-        getline(cin, input_text);
-
-        if (trim_text(input_text).empty())
-        {
-            user_value = default_value;
-            return false;
-        }
-
-        if (!parse_apy_input(input_text, user_value, error_message))
-        {
-            cout << error_message << endl;
-            continue;
-        }
-
-        if (user_value < minimum_value || user_value > maximum_value)
-        {
-            cout << "Error: Please enter an APY from "
-                << fixed << setprecision(2) << minimum_value * 100.0
-                << "% to " << maximum_value * 100.0 << "%." << endl;
-            continue;
-        }
-
-        return true;
-    }
 }
 
 /**
