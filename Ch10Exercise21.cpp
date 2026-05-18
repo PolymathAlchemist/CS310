@@ -78,11 +78,16 @@ constexpr int MENU_SIMULATE_MONTHS = 5;
 constexpr int MENU_EXIT = 6;
 
 // ========================================================================
-// Function Declarations (Prototypes)
+// Class Forward Declarations
 // ========================================================================
+
 class bankAccount;
 class checkingAccount;
 class savingsAccount;
+
+// ========================================================================
+// Function Declarations (Prototypes)
+// ========================================================================
 
 string format_with_commas(double numeric_value, int decimal_precision);
 
