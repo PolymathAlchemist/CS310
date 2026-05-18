@@ -251,8 +251,6 @@ void display_completion_message();
 
 bool confirm_program_exit();
 
-void pause_program_exit();
-
 // ========================================================================
 // Class Declarations
 // ========================================================================
@@ -2014,7 +2012,7 @@ void run_account_simulation_menu(
 void display_completion_message()
 {
     cout << "\nProgram complete. The checking and savings account simulation "
-         << "has ended after demonstrating the account inheritance structure."
+         << "\nhas ended after demonstrating the account inheritance structure."
          << endl;
 }
 
@@ -2052,15 +2050,6 @@ bool confirm_program_exit()
         cout << "Error: Enter N to return to the menu, or press Enter "
             << "to exit." << endl;
     }
-}
-
-/**
- * Pause before the program exits.
- */
-void pause_program_exit()
-{
-    cout << "\nPress Enter to exit...";
-    cin.get();
 }
 
 // ========================================================================
