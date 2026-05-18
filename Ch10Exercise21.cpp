@@ -370,7 +370,6 @@ public:
  */
 int main()
 {
-    bool program_should_exit = false;
 
     // Input
     display_introduction_banner();
@@ -392,8 +391,8 @@ int main()
 
         // Output
         display_completion_message();
-        program_should_exit = confirm_program_exit();
-    } while (!program_should_exit);
+        
+    } while (!confirm_program_exit());
 
     return 0;
 }
