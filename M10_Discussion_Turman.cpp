@@ -24,7 +24,7 @@
  * There are four intentional bugs added to this code, and it will not
  * compile or run properly until all have been found and fixed.
  *
- * This version uses raw pointers intentionally for the Chapter 12 discussion.
+ * This version uses raw pointers intentionally for the M10 discussion.
  * The dragon roster uses vector<Dragon*> to avoid object slicing when child
  * dragon objects are handled through the Dragon base class.
  *
