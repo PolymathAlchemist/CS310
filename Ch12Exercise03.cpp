@@ -1,5 +1,5 @@
 /**
-* ========================================================================
+ * ========================================================================
  * Course: CS310-T301 Programming with C++
  * Instructor: Dr. Robert Flowers
  * Assignment: M10 Assignment
@@ -18,11 +18,22 @@
  * ways to group each candidate's name and vote count, but dynamic arrays
  * match the current assignment requirements and chapter focus.
  *
- * This version extends the textbook exercise with defensive input validation
- * for candidate names and vote counts while preserving the original program
- * requirements. It also uses dynamic table sizing so candidate names, vote
- * totals, and percentages remain readable across a wider range of valid
- * input.
+ * The previous ordinal-word prompts were replaced with numbered candidate
+ * prompts so the program can scale cleanly up to the current 100-candidate
+ * limit without needing a large ordinal-word list.
+ *
+ * The 100-candidate limit is an arbitrary reasonable maximum for this
+ * exercise and can be adjusted in the Constants section.
+ *
+ * This version keeps the defensive input validation from the Ch08 version
+ * for candidate names and vote counts, while adding dynamic array allocation
+ * for the Ch12 requirement. It also uses dynamic table sizing for output
+ * so candidate names, vote totals, and percentages remain readable across
+ * a wider range of valid input.
+ *
+ * Documentation, comments, and spacing make up roughly 45% of the total
+ * line count and are used intentionally to keep the program easier to
+ * read, test, and maintain.
  *
  * Very small non-zero percentages are displayed as "< 0.01%" rather than
  * "0.00%" so the output does not imply a candidate received no measurable
