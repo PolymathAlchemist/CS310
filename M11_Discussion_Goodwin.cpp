@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <string>
+#include <utility>
 #include <conio.h>
 
 using namespace std;
@@ -20,7 +21,7 @@ private:
 public:
     //this constructor receives an item and saves it
     EquipmentBox(T newItem) {
-        item = newItem;
+        item = std::move(newItem);
     }
 
     //this function returns the stored item
@@ -40,13 +41,13 @@ private:
 
 public:
     //this constructor sets up a network device with a name and port count
-    NetworkDevice(string name, int ports) {
+    NetworkDevice(const string& name, const int ports) {
         deviceName = name;
         activePorts = ports;
     }
 
     //this overloaded plus operator adds the active ports from two devices
-    NetworkDevice operator+(NetworkDevice otherDevice) {
+    NetworkDevice operator+(const NetworkDevice& otherDevice) const {
         //this creates a new combined device using both port counts
         NetworkDevice combinedDevice("Combined Device", activePorts + otherDevice.activePorts);
 
@@ -61,15 +62,15 @@ public:
             //this checks for a port count that should not be allowed
             if (activePorts < 0) {
                 //this throws an error message when the port count is negative
-                throw "active ports cannot be negative";
+                throw runtime_error("active ports cannot be negative");
             }
 
             //this prints the device name and active port count if no problem is found
             cout << deviceName << " has " << activePorts << " active ports." << endl;
         }
-        catch (const char* message) {
+        catch (const runtime_error& message) {
             //this prints the error message from the throw statement
-            cout << "Port check failed: " << message << endl;
+            cout << "Port check failed: " << message.what() << endl;
         }
     }
 
