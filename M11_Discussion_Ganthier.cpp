@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdexcept>
+#include <conio.h>
 
 using namespace std;
 
@@ -57,6 +58,8 @@ int main() {
 
     // Attempt to trigger the exception handling inside the member function
     result.divideData(0);
+
+    getch();
 
     return 0;
 }

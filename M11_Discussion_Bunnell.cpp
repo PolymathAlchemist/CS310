@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <conio.h>
 using namespace std;
 
 template <typename T>
@@ -70,6 +71,8 @@ int main()
     {
         cout << "Caught exception: " << ex.what() << endl;
     }
+
+    getch();
 
     return 0;
 }
