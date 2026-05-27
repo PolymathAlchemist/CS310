@@ -39,4 +39,6 @@ set(CMAKE_CXX_STANDARD 20)
 # add_executable(Ch12Exercise03 Ch12Exercise03.cpp)
 # add_executable(M10_Discussion_Preller M10_Discussion_Preller.cpp)
 # add_executable(M11_Discussion_Turman CLEAN/M11_Discussion_Turman.cpp)
-add_executable(M11_Discussion_Turman M11_Discussion_Turman.cpp)
+#add_executable(M11_Discussion_Turman M11_Discussion_Turman.cpp)
+add_executable(Ch13Exercise17 Ch13Exercise17.cpp)
+
